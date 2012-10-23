@@ -1,0 +1,140 @@
+var db = $.couch.db(getCurrentDBName());
+var arrayC;
+var arrayC2;
+function getCurrentDBName() {
+	console.log( window.location);// hostname
+	return window.location.pathname.split("/")[1];
+
+}
+$(function() {
+	$( "#tabs" ).tabs(); $( "#tabs2" ).tabs();
+
+});
+$(document).ready(function() {
+
+	db.view("myViews/diaSessao",{
+		success: function(data){
+
+			//init stuff
+			datas   ( data.rows[0].value.ano ,(data.rows[0].value.mes),
+			(data.rows[0].value.dia));
+			//inicia datePicker
+			refreshItems(data.rows[0].value.ano ,pad2(data.rows[0].value.mes),
+			pad2(data.rows[0].value.dia));
+
+		}
+	});
+	
+	db.view("myViews/mesasAbertas", {
+		success: function(data){
+		    $('.numMesas ').text (data.total_rows);
+
+		   
+
+	       }
+	   });
+	
+	
+	
+	
+
+	$("#buttonAbreDia").click(function() {
+		db.view("myViews/diaSessao",{
+			success: function(data){
+
+				console.log(".................");
+				var ti=data.rows[0].value;
+				//init stuff
+				console.log("+++++++++++++++++");
+
+				var dia=$(".hasDatepicker").datepicker("getDate"); 
+				var rt=dia.getDate();
+				var md= dia.getMonth()+1;
+				console.log(dia.getFullYear()+"  -  "+rt+" - "+md);
+				ti.ano=parseInt(dia.getFullYear());
+				ti.dia=parseInt(dia.getDate());
+				ti.mes=parseInt(dia.getMonth()+1);
+				db.saveDoc(ti);
+
+			}
+		});
+
+
+
+
+	});
+
+
+
+
+
+});
+
+
+
+function refreshItems(a,m,d){
+	jQuery(function($){
+		$.datepicker.regional['pt-BR'] = {
+			closeText: 'Fechar',
+			prevText: '&#x3c;Anterior',
+			nextText: 'Pr&oacute;ximo&#x3e;',
+			currentText: 'Hoje',
+			monthNames: ['Janeiro','Fevereiro','Mar&ccedil;o','Abril','Maio','Junho',
+			'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun',
+			'Jul','Ago','Set','Out','Nov','Dez'],
+			dayNames: ['Domingo','Segunda-feira','Ter&ccedil;a-feira','Quarta-feira',
+			'Quinta-feira','Sexta-feira','Sabado'],
+			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'],
+			dayNamesMin: ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'],
+			weekHeader: 'Sm',
+			dateFormat: 'dd/mm/yy',
+			firstDay: 0,
+			isRTL: false,
+			showMonthAfterYear: false,
+			yearSuffix: ''
+		};
+		$.datepicker.setDefaults($.datepicker.regional['pt-BR']	);
+	});
+	$( "#datepicker" ).datepicker( );
+	$( "#datepicker").val(d+"/"+m+"/"+a);
+	console.log( $( "#datepicker").val()+"  data");
+ 
+
+
+
+	$( "#datepicker" ).change(function() {
+		 
+
+		var dia=$(".hasDatepicker").datepicker("getDate"); 
+		var rt=dia.getDate()+1;
+		var md= dia.getMonth()+1;
+		datas   ( dia.getFullYear(),md  , dia.getDate(),dia.getFullYear()) ;
+	});
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function pad2(number) {
+
+	return (number < 10 ? '0' : '') + number
+
+}
+
+

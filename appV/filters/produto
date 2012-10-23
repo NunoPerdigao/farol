@@ -1,0 +1,1 @@
+function(doc, req) { if(doc.type == 'produto') { return true; } else{return false; } }

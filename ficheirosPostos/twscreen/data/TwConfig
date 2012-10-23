@@ -1,0 +1,18 @@
+<Touch>
+	DriverScreenCount=255
+</Touch>
+<Displays>
+	<Display="0000">
+		DisplayLLX=0
+		DisplayLLY=65535
+		DisplayOrientation=0
+		DisplayScreen=0
+		DisplayURX=65535
+		DisplayURY=0
+	</Display>
+</Displays>
+<Framework>
+	FrameworkCopyright=2011
+	FrameworkVersion="7.13 Build 6"
+	SystemDefaultFile="/home/tux/twscreen/TwFactory.cfg"
+</Framework>

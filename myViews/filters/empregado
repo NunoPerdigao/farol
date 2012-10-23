@@ -1,0 +1,4 @@
+function(doc, req) {
+		 if(doc.type == 'empregado') { return true; }  
+		   else { return false; }
+}

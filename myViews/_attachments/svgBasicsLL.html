@@ -1,0 +1,1662 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>jQuery SVG Basics</title>
+<style type="text/css">
+    @import "jquery.svg.css";
+
+    #svgbasics {
+        width: 800px;
+        height: 600px;
+        border: 1px solid #484;
+    }
+ 
+table { width: 100%; border-collapse: collapse; padding: 0; margin: 0; }
+
+table { overflow-y: auto; font-family: sans; font-size:12px}
+
+table td {height:25px; padding:3px 4px; text-align: center; border-left: 1px solid #d0d0d0; }
+table td:first-child { border-left: none; }
+table tr:nth-child(odd)  { background-color: #e0e0e0; }
+table tr:nth-child(even) { background-color: #e8e8e8; }
+table tr.selected:nth-child(odd)  { background-color: #a0a0c0; }
+table tr.selected:nth-child(even) { background-color: #a8a8c8; }
+
+table tr:clicked { background-color: #aff; }
+#tabelaPedido .cod{ visibility: collapse;  }
+
+table tr:hover { background-color: #fff; }
+
+</style>
+<script type="text/javascript" src="/_utils/script/jquery.js">
+</script>
+<script type="text/javascript" src="/_utils/script/jquery.couch.js">
+</script>
+<script type="text/javascript" src="jquery.svg.js">
+</script>
+<script type="text/javascript" src="tabela.js">
+</script>
+<script type="text/javascript" src="jquery.svgdom.js">
+</script>
+<script type="text/javascript">
+
+
+$(function(){
+    $('#svgbasics').svg();
+    var svg = $('#svgbasics').svg('get'); 
+    svg.rect( 3, 3, 794, 594, {
+        id: 'ecMesasQ',
+        fill: "aad4ff",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2,
+        onclick:  " constroiQuadroEmpregados();"
+    });
+    $('button').click(drawShape);
+    diaS();
+});
+
+
+var colours = ['purple', 'red', 'orange', 'yellow', 'lime', 'green', 'blue', 'navy', 'black'];
+var db = $.couch.db(getCurrentDBName());
+function getCurrentDBName(){
+    return window.location.pathname.split("/")[1];
+}
+
+function diaS(){
+
+db.view("myViews/diaSessao",
+ {
+		success: function(data){
+		$('#diaSessao').val(data.rows[0].value.dia.toString()+'/'+data.rows[0].value.mes.toString()+'/'+data.rows[0].value.ano.toString());
+		}
+});
+
+
+}
+
+
+
+
+function fazPe(num ,anulacao ) {
+
+    if ($('#idId').val().length == 0   ) {
+        alert("abre mesa");
+        criaNovaContaELinha(num);
+        return;
+    }
+
+    db.openDoc( $('#idId').val(),{
+        success : function (document){
+
+            var linhas=document.linhaConta;
+            for(var i=0;i<num.length; i++){
+                var linh1={};
+                var p=num[i];
+                console.log(p.nome+"  . "+p.codigo);
+                linh1.codProduto=( p.codigo );
+                linh1.produto=	 p.nome;
+                linh1.quantidadeLinha= parseInt( p.quantidade);
+		var sinalP=1;
+		if(anulacao) sinalP=-1;
+                linh1.precoLinha= parseFloat( p.precoLinha)*sinalP;
+                linh1.anulacao= anulacao;
+
+                var d = new Date();
+                var h= d.getHours();
+                var m= d.getMinutes();
+                linh1.hora = h.toString()+':'+m.toString();
+                var numlinh=linhas.length;
+                linh1.linha=numlinh;
+                linhas=linhas.concat([linh1]);
+          
+
+
+            }
+
+            
+            document.linhaConta=linhas;
+
+            var f3= function (a){return a.precoLinha;};
+ 
+            document.total=(document.linhaConta.map(f3).reduce(function  (a,b){return (a+b);}) );
+
+ 	    var faux2=function (a){return a;};
+	    var f4=function (a){return (  a.precoLinha<0);};
+            var existeLinhasNegativas=(reduzLinhas(linhas,faux2).map(f4).reduce(function  (a,b){return (a||b);}) );
+
+	    if(existeLinhasNegativas){
+		alert("quantidade que pretende anular não existe");
+		console.log(linhas);
+	    }
+	    else  db.saveDoc(document,{
+                success : function () { alert('inserido');ecraMesa(parseInt($('#numMesa').val()),true);},
+                error   : function () { alert('não consegui inserir documento.' );                }
+
+            });
+
+
+        }
+    });
+}
+
+
+
+
+
+
+function criaNovaContaELinha(num){
+
+    var document = {};
+
+
+    var t1=0;
+    for(var i=0;i<num.length; i++){
+        var linh1={};
+        var p=num[i];
+        console.log(p.nome+"  . "+p.nome);
+        linh1.codProduto=( p.codigo );
+        linh1.produto=	 p.nome;
+        linh1.quantidadeLinha= parseInt( p.quantidade);
+        linh1.precoLinha= parseFloat( p.precoLinha);
+        linh1.anulacao= false;
+
+        var d = new Date();
+        var h= d.getHours();
+        var m= d.getMinutes();
+        linh1.hora = h.toString()+':'+m.toString();
+        var numlinh=i;
+        linh1.linha=numlinh;
+parseFloat( p.precoLinha);
+
+        document.total=t1;
+        if(document.linhaConta!=null)
+        document.linhaConta=document.linhaConta.concat(linh1);
+        else
+         document.linhaConta=[].concat(linh1)
+
+    }
+
+
+
+
+
+
+    var d = new Date();
+    var h= d.getHours();
+    var m= d.getMinutes();
+    document.hora = h.toString()+':'+m.toString();
+
+    var f3= function (a){return a.precoLinha;};
+    document.total=(document.linhaConta.map(f3).reduce(function  (a,b){return (a+b);}) );
+
+    document.empregado =    $('#numEmp').val();
+
+    document.diaSessao =   $('#diaSessao').val() ;
+
+    document.type = "mesa";
+    document.mesa = parseInt($('#numMesa').val());
+    document.aberta = true;
+
+    db.saveDoc(document,{
+        success : function (){alert('inserido');ecraMesa(parseInt($('#numMesa').val(),true));},
+        error   : function() { alert('nao consegui inseir documento.' );
+        }
+
+    });
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+function constroiQuadroEmpregados(){
+    var svg = $('#svgbasics').svg('get');
+    svg.clear();
+    var g = svg.group({
+        stroke: 'black',
+        strokeWidth: 2
+    });
+    svg.rect(g, 3, 3, 794, 594, {
+        id: 'ecMesasQ',
+        fill: "#aad4ff",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+    
+    var lm = [];
+    
+
+    db.view("myViews/empregadoLista", {
+        success: function(data){
+            var nem=0;
+            data.rows.map(function(row){
+                nem++;
+ 		 var g2 = svg.group(g,{
+        	stroke: 'black',
+        	strokeWidth: 2 });
+                var r3 = svg.rect(g2, 40 + 100 , 40 + (80 * nem), 80, 40, {
+                     rx: "6",ry :"6",
+                    fill: '#ff0000',
+                    stroke: 'orange',
+                    'stroke-width': 1
+                });
+
+
+                svg.text(g2, 55 + 100 , 70 + (80 * nem), row.key,  { strokeWidth:"0" ,stroke:"#000000", fill:"#000000"});
+               /* r3.onclick = function(){
+                    var this_c = row.key;
+                    return function(){
+                        ecraMesa(this_c,row.value.permissoes);
+                    }
+                }();
+*/
+
+                g2.onclick = function(){
+                    var this_c = row.key;
+                    return function(){
+                        $('#numEmp').val(this_c);
+                        constroiQuadroMesas(7, 6,row.value.permissoes);     }
+                }();
+
+
+            });
+
+
+        }
+
+
+    });
+
+};
+
+
+
+
+
+
+
+
+
+function constroiQuadroMesas(nc, nl,permissoes){
+	$('#numPerm').val(permissoes);
+    var lm = [];
+
+    db.view("myViews/mesasAbertas", {
+        success: function(data){
+            data.rows.map(function(row){
+
+                lm[row.key] = { aberta : row.value.aberta , nome : row.value.empregado ,tot : row.value.total };
+            });
+
+            desenhaQuadradinhos(nc, nl, lm,permissoes);
+        }
+    });
+
+};
+
+function desenhaQuadradinhos(nc, nl, lm,permissoes){
+    var svg = $('#svgbasics').svg('get');
+    svg.clear();
+  
+   
+    var g = svg.group({
+        stroke: 'black',
+        strokeWidth: 2
+    });
+
+
+    svg.rect(g, 3, 3, 794, 594, {
+        id: 'ecMesasQ',
+        fill: "darkslategray",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+         svg.circle(g, 794, 594, 80, {
+        id: 'tras',
+        fill: "lightgrey",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 1,
+         onclick:  "  constroiQuadroEmpregados();"
+         
+         
+    });
+    
+    
+
+    var contMesa = 0;
+    for (j = 0; j < nl; j++)
+        for (i = 0; i < nc; i++) {
+            contMesa++;
+            var cl1 = "green";
+            var p1=true;
+	    var p2=false;
+	    var totMesa=0.0;	 
+            var mes1 = ((i + 1) + (j * nc));
+            if (lm[(i + 1) + (j * nc)] == undefined)  {
+                cl1 = "blue";
+		p2=true;
+            }
+            else{
+            	totMesa=(lm[(i + 1) + (j * nc)]).tot;
+                var sx =((i + 1) + (j * nc));
+		p2=(lm[(i + 1) + (j * nc)]).nome== $('#numEmp').val();
+                if ( (lm[(i + 1) + (j * nc)]).aberta != true)  {cl1 = "red";p2=false;}
+                if ((!permissoes)&& !((lm[(i + 1) + (j * nc)]).nome== $('#numEmp').val()) ) { cl1 = "grey";p1=false;}
+            }
+		
+	     var g2 = svg.group({
+        		stroke: 'black',
+       			strokeWidth: 2
+    		});
+            var r3 = svg.rect(g2, 40 + 100 * i, 40 + 80 * j, 80, 40, {
+                		id: 'mesaR' + mes1,rx: "3",ry: "3",
+               			fill: cl1,
+                		stroke: 'orange',
+                		'stroke-width': 1
+            		      });
+            if(p1)
+                g2.onclick = function(){
+                    var this_c = mes1;
+		    var this_p= p2;
+                    return function(){
+                    ecraMesa(this_c,permissoes || this_p );
+
+                    }
+                }();
+            var tef = ((i + 1) + (j * nc)).toString();
+            svg.text(g, 40 + 100 * i, 40 + 80 * j, tef, { strokeWidth:"0" ,stroke:"#000000", fill:"#000000"});
+            if(totMesa>0){
+            	var ts=totMesa.toString();
+            	svg.text(g2, 75 + 100 * i, 70 + 80 * j, ts, { strokeWidth:"0" ,stroke:"#000000", fill:"#000000"});
+             }
+        }
+
+}
+
+
+
+function ecraMesa(ms,permissoes){
+console.log(permissoes);
+$(document).unbind('keydown', fk2);
+$(document).unbind('keydown', fk1);
+    var svg = $('#svgbasics').svg('get');
+    svg.clear();
+
+    var g = svg.group({
+        id: 'svgPedidos',
+        stroke: 'black',
+        strokeWidth: 2
+    });
+
+    svg.rect(g, 3, 3, 794, 594, {
+        id: 'ecPed1',
+        fill: "darkslategray",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+    
+
+     
+
+
+/* botoes artigos */
+    
+
+    svg.rect(g, 10 ,97,150,42, {
+        id: 'svg_5',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });
+    svg.rect(g, 10 ,144,150,42, {
+        id: 'svg_13',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });   
+        svg.rect(g, 10 ,191,150,42, {
+        id: 'svg_14',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });   
+        svg.rect(g, 10 ,238,150,42, {
+        id: 'svg_15',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });   
+    svg.rect(g, 10 ,285,150,42, {
+        id: 'svg_16',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });   
+    svg.rect(g, 10 ,332,150,42, {
+        id: 'svg_17',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });     
+    svg.rect(g, 10 ,379,150,42, {
+        id: 'svg_18',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });     
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    svg.rect(g, 167 ,97,150,42, {
+     	id: 'svg_39',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 167 ,144,150,42, {
+     	id: 'svg_40',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 167 ,191,150,42, {
+     	id: 'svg_41',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 167 ,238,150,42, {
+     	id: 'svg_42',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 167 ,285,150,42, {
+     	id: 'svg_43',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 167 ,332,150,42, {
+     	id: 'svg_44',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 167 ,379,150,42, {
+        id: 'svg_45',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    });    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    svg.rect(g, 326 ,60,200,35, {
+     	id: 'svg_47',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+     svg.rect(g, 326 ,100,200,35, {
+     	id: 'svg_48',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    svg.rect(g, 326 ,140,200,35, {
+     	id: 'svg_49',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    svg.rect(g, 326 ,180,200,35, {
+     	id: 'svg_50',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    svg.rect(g, 326 ,220,200,35, {
+     	id: 'svg_51',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+        svg.rect(g, 326 ,260,200,35, {
+     	id: 'svg_52',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+        svg.rect(g, 326 ,300,200,35, {
+     	id: 'svg_53',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+        svg.rect(g, 326 ,340,200,35, {
+     	id: 'svg_54',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 326 ,380,200,35, {
+     	id: 'svg_55',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 326 ,420,200,35, {
+     	id: 'svg_56',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+    svg.rect(g, 326 ,460,200,35, {
+     	id: 'svg_57',
+        fill: "#db679f",  "rx": "3","ry": "3",
+        'stroke-linejoin': 'round',
+        stroke: '#000000',
+        'stroke-width': 2
+    }); 
+    
+       
+    
+    
+
+    
+
+    svg.text(g,70 ,128,"Pratos", {
+    	id: 'svg_t1',
+    	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	strokeWidth : "0" ,strokeLinecap : "null" ,
+    	fontSize: "24", fill: "black"
+    });     
+    svg.text(g,70 ,173 ,"Bebidas", {
+    	id: 'svg_t2',
+    	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	strokeWidth : "0" ,strokeLinecap : "null" ,
+    	fontSize: "24", fill: "black"
+    }); 
+        
+     svg.text(g,70 ,218 ,"Entradas", {
+    	id: 'svg_t3',
+    	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	strokeWidth : "0" ,strokeLinecap : "null" ,
+    	fontSize: "24", fill: "black"
+    });        
+        
+    svg.text(g,70 ,263 ,"Sobremesa", {
+    	id: 'svg_t4',
+    	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	strokeWidth : "0" ,strokeLinecap : "null" ,
+    	fontSize: "24", fill: "black"
+    });        
+        
+        
+        
+    svg.text(g,240 ,308,"Cafetaria", {
+    	id: 'svg_t5',
+     	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	strokeWidth : "0" ,strokeLinecap : "null" ,
+    	fontSize: "21", fill: "black"
+    }); 
+    svg.text(g,240 ,353,"Complementos", {
+    	id: 'svg_t6',
+     	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	strokeWidth : "0" ,strokeLinecap : "null" ,
+    	fontSize: "21", fill: "black"
+    }); 
+    
+    
+   /*
+<text id="svg_39" xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" y="122" x="71.5" stroke-width="0" stroke="#000000" fill="#000000">Bebidas</text>
+<rect id="svg_52" transform="rotate(89.7001, 167.788, 182.088)" stroke-width="0" height="16.018786" width="193.018368" y="174.076635" x="71.277989" stroke="#000000" fill="#db679f">
+<rect id="svg_18" stroke-width="3" height="32" width="157.499987" y="235" x="177.00001" stroke="#000000" fill="#aad4ff">
+<text id="svg_43" xml:space="preserve" text-anchor="middle" font-family="serif" font-size="24" y="258.833344" x="255.875" stroke-width="0" stroke="#000000" fill="#000000">Vinho Verde</text>
+    
+    
+    */
+    
+    
+    /* fim botoes artigos*/
+    
+    /*rectangulo  cinzento*/
+    var perm1=$('#numPerm').val();
+   
+     svg.circle(g, 794, 594, 80, {
+        id: 'tras',
+        fill: "lightgrey",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 1,
+         onclick:  " constroiQuadroMesas(7, 6,"+perm1+");"
+         
+         
+    });
+    /* fim  rectangulo cinzento*/
+     svg.rect(g, 540, 210, 180, 340, {
+     id: 'ecPed2',
+     fill: "white",
+     'stroke-linejoin': 'round',
+     stroke: 'orange',
+     'stroke-width': 2
+     });
+
+     
+    svg.rect(g, 540, 10, 180, 150, {
+        id: 'ecPed3',
+        fill: "white",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+
+        'stroke-width': 2
+    });
+
+   svg.rect(g, 540, 555, 180, 35, {
+        id: 'recTotal',
+        fill: "white",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+
+        'stroke-width': 2
+    });
+
+
+if(permissoes){
+svg.image(g, 540, 170, 80, 30, 'botao.svg',{
+        onclick:  "pedido_click(evt)",
+        id: 'ecPed31'
+         
+    });
+
+
+
+
+    svg.rect(g, 620, 170, 80, 30, {
+        onclick:  "anulacao_click(evt)",
+        id: 'ecPed32',
+        fill: "red",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+}
+var gFM= svg.group({
+	onclick:  "fechaMesa_click(evt)",
+        id: 'gsvgMesa',
+        stroke: 'black',
+        strokeWidth: 2
+    });
+
+    svg.rect(gFM, 730, 240, 60, 60, {
+        id: 'ecPed4',
+        fill: "yellow",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+
+
+svg.text(gFM,"Consulta", {
+	"x" : "760" ,"y" : "270"  ,strokeWidth : "0" ,
+	strokeLinecap : "null" , fontSize: "15", 
+	"text-anchor":"middle",
+    	fontFamily: "serif",
+    	fill: "black"
+	});
+
+var gSF= svg.group({
+        onclick:  "contaSemFactura_click(evt)",
+        id: 'gsvgSF',
+        stroke: 'black',
+        strokeWidth: 2
+    });
+
+
+    svg.rect(gSF, 730, 330, 60, 60, {
+        id: 'ecPed5',
+        fill: "green",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+svg.text(gSF,"S/Fact", 
+	{fontFamily: "Verdana",
+	"x" : "760" ,"y" : "360" ,strokeWidth : "0" ,
+	strokeLinecap : "null" ,fontSize: "17", 
+	fill: "black","text-anchor":"middle"
+	});
+
+var gCF= svg.group({
+        onclick:  "tiraFactura_click(evt)",
+        id: 'gsvgCF',
+        stroke: 'black',
+        strokeWidth: 2
+    });
+
+    svg.rect(gCF, 730, 425, 60, 60, {
+        
+        id: 'ecPed6',
+        fill: "red",
+        'stroke-linejoin': 'round',
+        stroke: 'orange',
+        'stroke-width': 2
+    });
+
+svg.text(gCF,"C/Fact", {
+	fontFamily: "Verdana","text-anchor":"middle",
+	"x" : "760" ,"y" : "455" ,
+	strokeWidth : "0" ,strokeLinecap : "null" ,
+	fontSize: "17", fill: "black"
+	});
+
+
+
+    $(document).bind('keydown', fk1);
+
+
+
+    $('#numMesa').val(ms);
+    $('#idId').val("");
+    $('#revId').val("");
+
+    var tem1 = ms;
+    if (ms == undefined)
+        tem1 = 0;
+    $("ul#itemData").empty();
+    
+
+    db.view("myViews/linhasMesas", {
+        key: tem1,
+        success: function(data){
+            $('ul#itemData').append('<table  id=tabelaLinhas border="0">');
+
+
+            var mA = [];
+/*
+#tabelaLinhas idId revId e num nao sao elelementos visuais finais passarao a estar escondidos
+*/
+
+            data.rows.map(function(row){
+
+
+                $('#tabelaLinhas').append('<tr  id="' + row.value.linha + '">' +
+                        '<td width="7%">linha</td>  <td width="10%">   ' +
+                        row.value.linha +
+                        ' </td>  <td width="5%">       ' +
+                        row.value.quantidadeLinha +
+                        ' </td> <td width="5%"  >x </td>  <td>    ' +
+                        row.value.codProduto +
+                        "  </td>  " +
+                        " <td> " +
+                        row.value.produto +
+                        "  </td> <td>   " +
+                        row.value.precoLinha.toString() +
+                        '</td>  <td width="15%" >pedi. anulado</td>  <td  width="5%">   ' +
+                        row.value.anulacao +
+                        '</td></tr>');
+
+                $('#idId').val(row.value._id);
+                $('#revId').val(row.value._rev);
+
+
+            });
+
+			$('#numTotal').val(0);
+			var f3= function (a){return a.value.precoLinha;};
+			if(data.rows.length>0){
+				var t1=data.rows.map(f3).reduce(function  (a,b){return (a+b);}) ;
+				$('#numTotal').val(t1);
+				svg.text(g,"TOTAL   "+t1 , {fontFamily: "serif","x" : "540" ,
+				strokeWidth : "0" ,strokeLinecap : "null",strokeDasharray : "null", 
+				strokeLinejoin : "null","y" : "575" , fontSize: "16" });
+
+		
+
+
+
+		}
+            else {$('#numTotal').val(0);
+            }
+            var faux=function (a){return a.value;};
+            listagemMesa(reduzLinhas(data.rows,faux));
+ 
+            listagemPedido();
+
+
+        }
+
+    });
+
+
+}
+
+
+function listagemMesa(rows){
+
+
+
+    var svg = $('#svgbasics').svg('get').root();
+    var d= svg.firstChild;
+
+    var fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+
+    fo.setAttribute('width', '180');
+    fo.setAttribute('height', '340');
+    fo.setAttribute('x', '540');
+    fo.setAttribute('y', '210');
+
+
+    var body = document.createElementNS('http://www.w3.org/1999/xhtml', 'body');
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    body.style.margin = '0px';
+    body.style.height = '100%';
+
+
+
+    var table = document.createElement('table');
+
+    table.setAttribute('id', 'tabelaMesa');
+   
+    table.style.width = '100%';
+
+
+
+    var tbody = document.createElement('tbody');
+
+
+
+    for (var j = 0; j < rows.length; j++) {
+
+        if (rows[j] != undefined && rows[j].precoLinha!=0) {
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+
+            td.style.background = 'green';
+            td.appendChild(document.createTextNode(rows[j].quantidadeLinha));
+
+            var td2 = document.createElement('td');
+
+            
+            td2.appendChild(document.createTextNode(rows[j].produto));
+            var td3 = document.createElement('td');
+
+           /* td3.style.background = 'green';
+            */
+            td3.appendChild(document.createTextNode(rows[j].precoLinha));
+
+            tr.appendChild(td);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tbody.appendChild(tr);
+            table.appendChild(tbody);
+        }
+
+
+    }
+
+    body.appendChild(table);
+    fo.appendChild(body);
+    d.appendChild(fo);
+
+
+
+}
+
+
+function fk1 (e){
+    $(document).unbind('keydown', fk1);
+    $(document).bind('keydown', fk2);
+
+    var svg =$('#svgbasics').svg('get');
+    var q= svg.firstChild;
+
+
+    if( e.which ==27 ){
+        $(document).unbind('keydown', fk2);
+        $(document).bind('keydown', fk1);
+    }
+    else
+
+    if( e.which >=48 &&  e.which <=57 ){
+    
+    /*nao permitir aceder ao botoes que esta por baixo */
+    svg.rect(q, 0, 0, 800, 600, {
+        id: 'ecPed1',rx: "10", ry:"10",opacity:"0.5",
+        fill: "white"
+    });
+     /*fim nao permitir aceder ao botoes que esta por baixo */
+   var g = svg.group(q,{transform :   "translate(50, 55 )   ",
+        id: 'svgAnulacao', stroke: 'black',strokeWidth: 2
+    });
+    svg.rect(g, 3, 3, 600, 350, {
+        id: 'ecPed1',rx: "10", ry:"10",
+        fill: "darkslategray",'stroke-linejoin': 'round', stroke: 'orange',strokeWidth: 6
+    });
+
+/* botao anular  */
+
+var g4 = svg.group(g,{
+     transform :   "translate(73, 260 )", 
+     onmousedown : "cancelaInsere(evt)"
+    });
+svg.rect(g4,0,0,60,60,  {
+      rx:"36" ,ry:"10", id:"botaoCancelaAnula" ,
+      fill:"lightgrey", strokeLinejoin:"round", 
+      stroke:"#1F1A17", strokeWidth:"3"   
+         });
+         
+svg.line(g4,15,15,45,45,{style:" stroke: red;   stroke-width: 9px"});
+svg.line(g4,45,15,15,45,{style:" stroke: red;   stroke-width: 9px"});
+
+/* fim botao anular*/
+        
+     	svg.rect(g, 50, 83,140, 43, {
+       		 id: 'recText1',
+        	fill: "white",stroke: 'orange',strokeWidth: 2
+    	});    
+        svg.rect(g,240, 83,240, 43, {
+       	 	id: 'recText2',
+        	fill: "white",stroke: 'orange',strokeWidth: 2
+    	}); 
+    	  
+        var tt = svg.text(g,String.fromCharCode(e.which), {
+        id : "textInserePedido",fontFamily: "Verdana","x" : "60" ,"y" : "120",
+        strokeWidth : "0" ,strokeLinecap : "null" ,
+        fontSize: "38", fill: "black"});   
+        
+
+        var d = $('#svgbasics').svg('get').root();
+
+
+        var fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        fo.setAttribute('id', 'textInputQuant');
+        fo.setAttribute('width', '80');
+        fo.setAttribute('height', '50');
+        fo.setAttribute('x', '450');
+        fo.setAttribute('y', '270');
+        var body = document.createElementNS('http://www.w3.org/1999/xhtml', 'body');
+        body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+        body.style.margin = '0px';
+        body.style.height = '100%';
+
+
+
+        var inT1 = document.createElementNS('http://www.w3.org/1999/xhtml', 'input');
+        inT1.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+        inT1.setAttribute('x', '350');
+        inT1.setAttribute('y', '380');
+        inT1.setAttribute('id', 'qntPed');
+        inT1.setAttribute('size', '4');
+        inT1.style.type = 'text';
+        body.appendChild(inT1);
+        fo.appendChild(body);
+        g.appendChild(fo);
+        $('#qntPed').val("1");
+        $('#qntPed').focus(function() {
+
+            $(document).unbind('keydown', fk2);
+            $(document).unbind('keydown', fk1);
+            $(document).bind('keydown', fk3);
+
+        });
+
+
+
+
+    }
+    else
+
+    if( e.which ==8 ||  e.which ==46 ){
+
+        svg.rect(q,200, 260, 320,200, {
+            id: 'rectInserePedido',
+            fill: "white",
+            'stroke-linejoin': 'round',
+            stroke: 'orange',
+            'stroke-width': 2
+        });
+
+        var tt = svg.text(q,"", {id : "textInserePedido",fontFamily: "Verdana","x" : "255" ,"y" : "325" ,
+            fontSize: "42.5", fill: "red"});
+        var d = $('#svgbasics').svg('get').root().firstChild;;
+
+
+
+
+
+        var fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        fo.setAttribute('id', 'textInputQuant');
+        fo.setAttribute('width', '80');
+        fo.setAttribute('height', '50');
+        fo.setAttribute('x', '450');
+        fo.setAttribute('y', '380');
+        var body = document.createElementNS('http://www.w3.org/1999/xhtml', 'body');
+        body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+        body.style.margin = '0px';
+        body.style.height = '100%';
+
+
+
+        var inT1 = document.createElementNS('http://www.w3.org/1999/xhtml', 'input');
+        inT1.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+        inT1.setAttribute('x', '450');
+        inT1.setAttribute('y', '380');
+        inT1.setAttribute('id', 'qntPed');
+        inT1.setAttribute('size', '4');
+        inT1.style.type = 'text';
+        body.appendChild(inT1);
+        fo.appendChild(body);
+        d.appendChild(fo);
+        $('#qntPed').val("1");
+        $('#qntPed').focus(function() {
+
+            $(document).unbind('keydown', fk2);
+            $(document).unbind('keydown', fk1);
+            $(document).bind('keydown', fk3);
+
+        });
+
+
+
+    }
+    else{
+        $(document).unbind('keydown', fk2);
+        $(document).bind('keydown', fk1);
+    }
+
+
+
+
+
+}
+function fk2 (e){
+
+
+    /*   */
+
+
+    var svg =$('#svgbasics').svg('get');
+    var tt= svg.getElementById('textInserePedido');
+
+    if( e.which >=48 &&  e.which <=57 ){
+
+        if (tt!=null)
+            tt.firstChild.nodeValue=tt.firstChild.nodeValue+String.fromCharCode(e.which);
+        else
+            tt.firstChild.nodeValue=String.fromCharCode(e.which);
+    }
+
+    if( e.which ==8 ||  e.which ==46 ){
+        if (tt!=null)
+            tt.firstChild.nodeValue= (tt.firstChild.nodeValue).slice(0,(tt.firstChild.nodeValue).length - 1);
+        else
+            tt.firstChild.nodeValue= "";
+    }
+    if( e.which ==27 ){
+
+        var svg =$('#svgbasics').svg('get');
+        var g = svg.getElementById('rectInserePedido');
+
+        if(g != null){
+            svg.remove(g);
+        }
+        var g2 = svg.getElementById('textInserePedido');
+
+        if(g2 != null){
+            svg.remove(g2);
+        }
+
+         var g3 = svg.getElementById('textInputQuant');
+
+        if(g3 != null){
+            svg.remove(g3);
+        }
+
+        $(document).unbind('keydown', fk2);
+        $(document).bind('keydown', fk1);
+    }
+
+    if (e.which == 13)    {
+
+        var  ms=  ( tt.firstChild.nodeValue);
+        var qtd=$('#qntPed').val();
+        db.view("myViews/produtoLista", {"keys":[ms ],
+            success: function(data){
+
+                if(data.rows.length==1){
+
+                    $('#tabelaPedido').append('<tr ><td class="cod">'+ms+'</td><td class="qnt" >'+ qtd+'</td><td >'+data.rows[0].value.nomeProduto +'</td><td >'+ qtd* data.rows[0].value.preco+'</td></tr>');
+
+                    return false;
+
+                }
+                if(data.rows.length==0) alert("produto nao existe");
+            }
+        });
+
+
+        var svg =$('#svgbasics').svg('get');
+        var g = svg.getElementById('rectInserePedido');
+
+        if(g != null){
+            svg.remove(g);
+        }
+        var g2 = svg.getElementById('textInserePedido');
+
+        if(g2 != null){
+            svg.remove(g2);
+        }
+         var g3 = svg.getElementById('textInputQuant');
+
+        if(g3 != null){
+            svg.remove(g3);
+        }
+        $(document).unbind('keydown', fk2);
+        $(document).unbind('keydown', fk1);
+	$(document).bind('keydown', fk1);
+
+
+
+
+    }
+}
+
+function fk3 (e){
+
+
+    /*   */
+
+
+    var svg =$('#svgbasics').svg('get');
+    var tt2= svg.getElementById('textInserePedido');
+
+
+
+    if (e.which == 13)    {
+
+        var  ms=  ( tt2.firstChild.nodeValue);
+        var qtd=$('#qntPed').val();
+        db.view("myViews/produtoLista", {"keys":[ms ],
+            success: function(data){
+
+                if(data.rows.length==1){
+           
+
+                    $('#tabelaPedido').append('<tr ><td  class="cod">'+ms+'</td><td  class="qnt">'+ qtd+'</td><td >'+data.rows[0].value.nomeProduto +'</td><td >'+ qtd* data.rows[0].value.preco+'</td></tr>');
+
+                    return false;
+
+                }
+                if(data.rows.length==0) alert("produto nao existe");
+            }
+        });
+
+
+        var svg =$('#svgbasics').svg('get');
+        var g = svg.getElementById('rectInserePedido');
+
+        if(g != null){
+            svg.remove(g);
+        }
+        var g2 = svg.getElementById('textInserePedido');
+
+        if(g2 != null){
+            svg.remove(g2);
+        }
+         var g3 = svg.getElementById('textInputQuant');
+
+        if(g3 != null){
+            svg.remove(g3);
+        }
+        $(document).unbind('keydown', fk2);
+        $(document).unbind('keydown', fk1);
+	$(document).bind('keydown', fk1);
+
+
+
+    }
+}
+function pedido_click(evt){
+
+    var g= $("#tabelaPedido tr");
+    var cod1=[];
+    for(var i=0;i<g.length;i++){
+
+        var a2=g[i].firstChild.innerHTML;
+        var b2=g[i].firstChild.nextSibling.innerHTML;
+        var c2=g[i].firstChild.nextSibling.nextSibling.innerHTML;
+        var d2=g[i].firstChild.nextSibling.nextSibling.nextSibling.innerHTML;
+
+
+        cod1[i]={'codigo' : a2, 'quantidade' : b2, 'nome' : c2, 'precoLinha': d2};
+
+
+    }
+
+    fazPe(cod1 ,false )
+
+}
+
+
+
+
+
+
+
+
+
+
+function fechaMesa_click(e) {
+
+ if ($('#idId').val().length == 0) {
+     return;
+       }
+
+      db.openDoc( $('#idId').val(),{
+           success : function (document){
+
+
+				document.aberta = false;
+				saveLinha( document);
+			}
+
+		}
+
+
+       );
+
+
+}
+
+
+function contaSemFactura_click(e) {
+
+ if ($('#idId').val().length == 0) {
+     return;
+       }
+
+      db.openDoc( $('#idId').val(),{
+           success : function (document){
+
+
+				document.type = "conta";
+				saveLinha( document);
+			}
+
+		}
+
+
+       );
+
+
+}
+
+function  tiraFactura_click (e) {
+
+ if ($('#idId').val().length == 0) {
+     return;
+       }
+
+      db.openDoc( $('#idId').val(),{
+           success : function (document){
+
+				tfact(document);
+
+
+			}
+
+		}
+
+
+       );
+
+
+}
+
+
+
+
+function tfact(doc){
+db.view("myViews/countFacturas", {
+					success: function(data){
+						 doc.numFactura=1;
+				                if(data.rows.length!=0) doc.numFactura=data.rows[0].value+1;
+						doc.type = "factura";
+						saveLinha( doc);
+				}
+
+				});
+}
+
+
+function saveLinha(document){
+
+        db.saveDoc( document, {
+
+            success: function() {
+
+
+            },
+            error: function() {
+                alert( "Cannot save new document." );
+            }
+        });
+
+
+
+    }
+
+
+
+
+
+function listagemPedido( ){
+
+
+
+    var d = $('#svgbasics').svg('get').root().firstChild;
+
+
+    var fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+    fo.setAttribute('width', '180');
+    fo.setAttribute('height', '150');
+    fo.setAttribute('x', '540');
+    fo.setAttribute('y', '10');
+
+
+    var body = document.createElementNS('http://www.w3.org/1999/xhtml', 'body');
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    body.style.margin = '0px';
+    body.style.height = '100%';
+
+    var table = document.createElement('table');
+
+    table.setAttribute('id', 'tabelaPedido');
+    
+    table.style.width = '100%';
+
+    var tbody = document.createElement('tbody');
+
+
+    table.appendChild(tbody);
+
+
+    body.appendChild(table);
+    fo.appendChild(body);
+    d.appendChild(fo);
+
+
+
+}
+
+
+
+function reduzLinhas(rows,f1){
+    var aR = [];
+
+    for (var i = 0; i < rows.length; i++) {
+ var sinal = 1;
+if(f1(rows[i]).anulacao!=undefined && f1(rows[i]).anulacao==true)
+            sinal = -1;
+ 
+        if (aR[f1(rows[i]).codProduto] == undefined) {
+            var rR1 = {};
+ 
+           
+                
+                rR1.quantidadeLinha = f1(rows[i]).quantidadeLinha *sinal;
+            
+rR1.produto = (f1(rows[i]).produto  );
+rR1.precoLinha = (f1(rows[i]).precoLinha  );
+console.log(f1(rows[i]).precoLinha + "  "+f1(rows[i]).codProduto);
+            aR[f1(rows[i]).codProduto] = rR1;
+
+        }
+        else {
+            var rR2 = {};
+
+ 
+           
+
+
+                rR2.precoLinha = (aR[f1(rows[i]).codProduto].precoLinha) +(f1(rows[i]).precoLinha );
+                rR2.quantidadeLinha = aR[f1(rows[i]).codProduto].quantidadeLinha +(f1(rows[i]).quantidadeLinha *sinal);
+        
+           
+console.log(f1(rows[i]).precoLinha + "  "+f1(rows[i]).codProduto);
+rR2.produto = (f1(rows[i]).produto  );
+ aR[f1(rows[i]).codProduto] = rR2;
+
+        }
+
+
+
+    }
+
+    return aR;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function drawShape(){
+    var shape = this.id;
+
+
+    var svg = $('#svgbasics').svg('get');
+    if (shape == 'rect') {
+        constroiQuadroEmpregados();
+
+    }
+    else
+    if (shape == 'line') {
+        svg.line(random(600), random(500), random(400), random(300), {
+            stroke: colours[random(9)],
+            'stroke-width': random(5) + 1
+        });
+        $('#mesaR1').click(function(){
+            alert("ijiji");
+
+        });
+    }
+    else
+    if (shape == 'circle') {
+        svg.circle(random(400) + 50, random(200) + 50, random(80) + 20, {
+            fill: colours[random(9)],
+            stroke: colours[random(9)],
+            'stroke-width': random(5) + 1
+        });
+    }
+    else
+    if (shape == 'ellipse') {
+        svg.ellipse(random(300) + 50, random(200) + 50, random(80) + 20, random(80) + 20, {
+            fill: colours[random(9)],
+            stroke: colours[random(9)],
+            'stroke-width': random(5) + 1
+        });
+    }
+    else
+    if (shape == 'clear') {
+        svg.clear();
+    }
+    else
+    if (shape == 'criaLinha') {
+        var anul= false;
+
+    }
+    else
+    if (shape == 'deleteLinha') {
+        var anul= true;
+
+    }
+
+
+}
+
+
+
+
+function random(range){
+    return Math.floor(Math.random() * range);
+}
+
+
+
+
+</script>
+</head>
+<body>
+<div id="svgbasics">
+</div>
+<p>
+    <button id="rect">
+        Esc
+    </button>
+    <button id="line">
+        Add line
+    </button>
+    <button id="circle">
+        Add circle
+    </button>
+    <button id="ellipse">
+        Add ellipse
+    </button>
+    <button id="clear">
+        Clear
+    </button>
+    <br><br>
+
+
+<h3>Id documento</h3>
+
+<input type="text" name="id" id="idId" size = 34 STYLE="background-color:  #df781c; font-family: Verdana;  font-size: 10px ; border: none"/>
+<input type="text" name="rev" id="revId" size = 34 STYLE="background-color:  #df781c; font-family: Verdana;  font-size: 10px ; border: none"/>
+
+<br>
+<ul id="formPedidos">
+    <form name="mesaForm">
+    </form>
+    <h3>Mesa</h3>
+
+
+    <br>
+    <input type="button" id="abreMesa" value="abre Mesa" />
+
+    <div id="content">
+        <label for="name">
+            mesa:
+        </label>
+        <input type="text" name="mMes" id="numMesa" size=4 />
+        <label for="empregado">
+            empregado:
+        </label>
+        <input type="text" name="mEmp" id="numEmp" size=4 />
+        <label for="permissoes">
+            permissoes:
+        </label>
+        <input type="text" name="mPerm" id="numPerm" size=4 />
+        <label for="total">
+            total:
+        </label>
+        <input type="text" name="mTot" id="numTotal" size=4 />
+         <label for="sessao">
+            sessao:
+        </label>
+        <input type="text" name="mTot" id="diaSessao" size=4 />
+
+
+    </div>
+</ul>
+
+<ul id="itemData">
+</ul>
+</body>
+</html>

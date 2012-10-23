@@ -1,0 +1,423 @@
+#!/bin/bash
+#
+# Copyright 2007-2011 3M. All rights reserved.
+#
+# This script installs the MT7 touch screen driver
+# During installation, all directories must be writeable.
+#
+
+# These symbols point to where the MT7 software binaries and data reside.
+# The script attempts to detect where the installation kit is. If this
+# fails, you need to set BinDir.
+# The data directory must be on writeable media. The script normally uses
+# the directory where the installation kit resides as the data directory.
+# If you need the data directory to be elsewhere, set DataDir.
+BinDir=""
+DataDir=""
+
+# If desired, define a file to contain driver startup options and set
+# the TwDrv_Cfg symbol to the full path of the file. Normally this is
+# not needed.
+TwDrv_Cfg=""
+
+# This symbol points to where the Java VM binaries reside.
+JavaBinDir=""
+
+# These symobls point to system and applictaion directories other than
+# those specific to the MT7 software
+UdevDir="/etc/udev"
+HotplugDir="/etc/hotplug"
+XorgDir="/usr/lib/xorg/modules/input"
+XFree86Dir="/usr/X11R6/lib/modules/input"
+LibDir="/usr/lib"
+LibDir32="/usr/lib32"
+LibDir64="/usr/lib64"
+SEDir1="/usr/selinux/booleans"
+SEDir2="/selinux/booleans"
+LSBDir="/lib/lsb"
+
+Arch="`uname -a | grep x86_64`"
+
+if [ -z "$Arch" ] 
+then
+   SubDir=""
+else
+   SubDir="x64/"
+   XorgDir64="/usr/lib64/xorg/modules/input"
+   if [ -d $XorgDir64 ]
+   then
+      XorgDir=$XorgDir64
+   fi
+   if [ -d $LibDir32 ]
+   then 
+      LibDir=$LibDir32
+   fi
+fi
+
+# The InitDir symbol points to where this script places an 'init' script.
+# If left blank, this script first looks for /etc/init.d and then /etc/rc.d.
+# If this is not appropriate or this script otherwise fails, set this value.
+InitDir=""
+
+# This symbol enables permission for some MT7 shared objects on
+# SELinux systems. On most systems SEGivePermission is texrel_shlib_t.
+# Change this variable if another security type is appropriate.
+SEGivePermission="texrel_shlib_t"
+
+# This symbol affects when the X input driver converts raw touch screen
+# coordinates into screen coordiates. Normally, the X input driver reports
+# the raw coordinates to the X server which then calls an conversion
+# routine. Some versions of the X server expect the initial report to
+# contain converted coordinates. If your touch behavior is off and
+# calibration does not address the problem, set ConvertAtRead to true.
+ConvertAtRead="false"
+
+# This symbol defines the location of the xorg.conf file. This is required
+# for the MT7 software to operate. Change this if the file resides elsewhere.
+XorgConf="/etc/X11/xorg.conf"
+
+# These symbols define where the 50MT7-xinit script needs to go and what
+# suffix it requires. The script places this file automatically in
+# /etc/X11/xinit/xinitrc.d and /etc/X11/Xsession.d without a suffix. If
+# your distribution requires another location or requires a suffix on the
+# file, set these symbols.
+XinitDir=""
+XinitSuffix=""
+
+# Determine the installation directory
+if [ -z $BinDir ]
+then
+   if [ $(echo $0 | grep ^/) ]
+   then
+      BinDir=$0
+   else
+      BinDir=$(echo $PWD"/"$0 | sed s#[.]/##)
+   fi
+   BinDir=$(echo $BinDir | sed s%/[^/]*$%%)
+fi
+
+# Determine if the system is compatible
+$BinDir/TwCompat
+if [ $? != 0 ]
+then
+   echo "Cannot find shared memory support"
+   exit
+fi
+
+# Determine if the xorg.conf file is present
+if [ ! -e $XorgConf ]
+then
+   echo "Cannot find $XorgConf"
+   exit
+fi
+
+# Determine the data directory
+[ -z $DataDir ] && DataDir=$BinDir
+
+# Create the data and fifo directories
+if [ $DataDir != $BinDir ]
+then
+   [ -e $DataDir ] || mkdir $DataDir
+   chmod a+w $DataDir
+   ln -s $DataDir $BinDir/data
+else
+   [ -e $BinDir/data ] || mkdir $BinDir/data
+fi
+chmod a+w $BinDir/data
+[ -e $BinDir/data/fifo ] || mkdir $BinDir/data/fifo
+chmod a+w $BinDir/data/fifo
+
+# Determine the init script directories
+if [ -z $InitDir ] && [ -d /etc/init.d ]
+then
+   if [ $(ls -l /etc/init.d/ | sed -e /functions/d -e /^total\ [0-9]*$/d | wc -l) != 0 ]
+   then
+      InitDir="/etc/init.d"
+   fi
+fi
+if [ -z $InitDir ]
+then
+   if [ -e /etc/rc.d/rc.local ]
+   then
+      InitDir=/etc/rc.d
+   else
+      InitDir=$BinDir
+   fi
+fi
+
+# Install the init script
+[ -e $InitDir/TWDrvStartup ] && rm -f $InitDir/TWDrvStartup
+sed -e s#%BINDIR%#$BinDir#g \
+    -e s#%INITDIR%#$InitDir#g \
+    -e s#%LSBDIR%#$LSBDir#g \
+    -e s#%TWDRV_CFG%#$TwDrv_Cfg#g $BinDir/TWDrvStartup.ORIG \
+    >$InitDir/TWDrvStartup
+chmod a+x $InitDir/TWDrvStartup
+if perl $BinDir/TwIsThere.perl chkconfig
+then
+   if [ -f TwPathAppend.sh ]
+   then
+    . TwPathAppend.sh
+   fi
+   chkconfig --add TWDrvStartup >/dev/null
+elif perl $BinDir/TwIsThere.perl update-rc.d
+then
+   update-rc.d TWDrvStartup defaults >/dev/null
+elif perl $BinDir/TwIsThere.perl update-rc
+then
+   update-rc add TWDrvStartup default >/dev/null
+elif [ -e $InitDir/rc.local ]
+then
+   sed -e '$ a\
+%INITDIR%/TWDrvStartup start
+' $InitDir/rc.local >$InitDir/rc.local.TEMP
+   rm -f $InitDir/rc.local
+   sed -e s#%INITDIR%#$InitDir# $InitDir/rc.local.TEMP >$InitDir/rc.local
+   rm -f $InitDir/rc.local.TEMP
+   chmod +x $InitDir/rc.local
+else
+   echo "Cannot install the init script"
+fi
+
+# Test for USB support
+if [ -z $(uname -r | grep ^2\.4\.) ]
+then
+   # Copy the udev rules script
+   Hotplug=0
+   if [ -d $UdevDir/rules.d ]
+   then
+      if [ -e $UdevDir/rules.d/99-TwDriver.rules ]
+      then
+         rm -f $UdevDir/rules.d/99-TwDriver.rules
+      fi
+      sed s#%BINDIR%#$BinDir#g $BinDir/99-TwDriver.rules.ORIG \
+         >$UdevDir/rules.d/99-TwDriver.rules
+      Hotplug=1
+   fi
+   if [ -d $HotplugDir/usb ] && [ -e $HotplugDir/usb.agent ]
+   then
+      [ -e $HotplugDir/usb/TwHotplug ] && rm -f $HotplugDir/usb/TwHotplug
+      sed s#%BINDIR%#$BinDir#g $BinDir/TwHotplug.ORIG > $HotplugDir/usb/TwHotplug
+      chmod a+x $HotplugDir/usb/TwHotplug
+      [ -e $HotplugDir/usb.usermap ] || echo "# Created by MT7" >$HotplugDir/usb.usermap
+      sed <$HotplugDir/usb.usermap >$HotplugDir/usb.usermap.TEMP '$ a\
+# TwHotplug is for the MT7 for Linux software\
+TwHotplug            0x0001      0x0596   0x0000    0x0000       0x0000      0x00         0x00            0x00            0x06            0x00               0x00               0x00000000
+'
+      rm -f $HotplugDir/usb.usermap
+      mv $HotplugDir/usb.usermap.TEMP $HotplugDir/usb.usermap
+      Hotplug=1
+   fi
+   if [ $Hotplug == 0 ]
+   then
+      echo "Hotplugging of USB touch screen controllers is not supported"
+   fi
+else
+   echo "USB touch screen controllers are not supported under kernel 2.4"
+fi
+
+# Test for the version of C++ standard libraries
+if [ -e $LibDir/libstdc++.so.6 ]
+then
+   CppExt="6"
+elif [ -e $LibDir/libstdc++.so.5 ]
+then
+   CppExt="5"
+else
+   # Test newer systems' loaded libraries rather than single library path
+   $BinDir/TwLibTest libstdc++.so.6
+   if [ x$? == x1 ]
+   then 
+      CppExt="6"
+   else
+     $BinDir/TwLibTest libstdc++.so.5
+     if [ x$? == x1 ]
+     then
+       CppExt="5"
+     else
+       echo "Cannot find needed libstdc++.so in $LibDir"
+       CppExt=""
+     fi
+   fi
+fi
+
+# Link the libraries into /usr/lib
+perl $BinDir/TwLibInstall.perl install $LibDir $BinDir/lib*.so
+
+if [ -d $LibDir64 ]
+then
+   perl $BinDir/TwLibInstall.perl install $LibDir64 $BinDir/x64/libTwDrvFifo.so
+fi
+
+if [ -d $LibDir32 ]
+then
+   perl $BinDir/TwLibInstall.perl install $LibDir32 $BinDir/libTwDrvFifo.so
+fi
+
+if [ x$CppExt != x ]
+then
+   perl $BinDir/TwLibInstall.perl install $LibDir $BinDir/so$CppExt/lib*.so
+fi
+
+# Link Xinerama/RandR sensitive files
+if [ x$CppExt != x ]
+then
+   $BinDir/TwLibTest $LibDir/libTwSystem.so
+   if [ x$? == x0 ]
+   then
+      rm -f $LibDir/libTwSystem.so
+      ln -s $LibDir/libTwSystemNoXin.so $LibDir/libTwSystem.so
+      ln -s $BinDir/TwMonitor.bin$CppExt $BinDir/TwMonitor
+   elif perl $BinDir/TwIsThere.perl xrandr
+   then
+      #In case of no RnR, suppress the warnings
+      RnRver="$(xrandr -v 2> /dev/null)"
+      if [ $? == "0" ]
+      then
+         RnRver=""
+         RnRver="$(xrandr -v | grep 1.[0-1])"
+         if [ -n "$RnRver" ]
+         then
+            rm -f $LibDir/libTwSystem.so
+            ln -s $LibDir/libTwSystemRnR.so $LibDir/libTwSystem.so
+            ln -s $BinDir/TwMonitorRnR.bin$CppExt $BinDir/TwMonitor
+         else
+            rm -f $LibDir/libTwSystem.so
+            ln -s $LibDir/libTwSystemRnR12.so $LibDir/libTwSystem.so
+            ln -s $BinDir/TwMonitorRnR.bin$CppExt $BinDir/TwMonitor
+         fi
+      else
+         ln -s $BinDir/TwMonitor.bin$CppExt $BinDir/TwMonitor
+      fi
+   else
+      ln -s $BinDir/TwMonitor.bin$CppExt $BinDir/TwMonitor
+   fi
+fi
+
+# Copy the X input driver
+XCopyDefault=0
+if [ -d $XorgDir ]
+then
+   XDir=$XorgDir
+   if [ -n "$(X -version 2>&1 | grep X\.Org[^1]*1\.10\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.10.0
+      XCopyDefault=1
+   elif [ -z "$(X -version 2>&1 | grep X\.Org[^1]*1\.[4-9]\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so
+   elif [ -z "$(X -version 2>&1 | grep X\.Org[^1]*1\.[5-9]\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.4
+   elif [ -z "$(X -version 2>&1 | grep X\.Org[^1]*1\.[6-9]\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.5.1
+      XCopyDefault=1
+   elif [ -z "$(X -version 2>&1 | grep X\.Org[^1]*1\.[7-9]\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.6.0
+      XCopyDefault=1
+   elif [ -z "$(X -version 2>&1 | grep X\.Org[^1]*1\.[8-9]\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.7.0
+      XCopyDefault=1
+   elif [ -z "$(X -version 2>&1 | grep X\.Org[^1]*1\.[9]\.)" ]
+   then
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.8.0
+      XCopyDefault=1
+   else
+      XSrc=$BinDir/"$SubDir"twxinput_drv.so.1.9.0
+      XCopyDefault=1
+   fi
+elif [ -d $XFree86Dir ]
+then
+   XDir=$XFree86Dir
+   XSrc=$BinDir/"$SubDir"twxinput_drv.so
+else
+   XDir=""
+   echo "Cannot install the X input module"
+fi
+if [ -d $XDir ]
+then
+   [ -e $XDir/twxinput_drv.o ] && rm -f $XDir/twxinput_drv.o
+   [ -e $XDir/twxinput_drv.so ] && rm -f $XDir/twxinput_drv.so
+   ln -s $XSrc $XDir/twxinput_drv.so
+fi
+
+# Install the xinit scripts
+if [ -d /etc/X11/xinit/xinitrc.d ]
+then
+   sed s#%BINDIR%#$BinDir#g $BinDir/50MT7-xinit.ORIG \
+      >/etc/X11/xinit/xinitrc.d/50MT7-xinit$XinitSuffix
+   chmod a+x /etc/X11/xinit/xinitrc.d/50MT7-xinit$XinitSuffix
+fi
+if [ -d /etc/X11/Xsession.d ]
+then
+   sed s#%BINDIR%#$BinDir#g $BinDir/50MT7-xinit.ORIG \
+      >/etc/X11/Xsession.d/50MT7-xinit$XinitSuffix
+   chmod a+x /etc/X11/Xsession.d/50MT7-xinit$XinitSuffix
+fi
+if [ x$XinitDir != x ]
+then
+   sed s#%BINDIR%#$BinDir#g $BinDir/50MT7-xinit.ORIG \
+      >$XinitDir/50MT7-xinit$XinitSuffix
+   chmod a+x $XinitDir/50MT7-xinit$XinitSuffix
+fi
+
+# Set up the SELinux security types
+if [ -d $SEDir1 ]
+then
+   SEDir=$SEDir1
+elif [ -d $SEDir2 ]
+then
+   SEDir=$SEDir2
+else
+   SEDir=""
+fi
+if [ x$SEDir != x ]
+then
+   chcon -t $SEGivePermission $LibDir/libTwSystem.so
+   chcon -t $SEGivePermission $LibDir/libTwConfig.so
+   chcon -t $SEGivePermission $LibDir/libTwIO_Utilities.so
+   chcon -t $SEGivePermission $LibDir/libTwAppIO_JNI.so
+   chcon -t $SEGivePermission $LibDir/libTwCommon_JNI.so
+   chcon -t $SEGivePermission $LibDir/libTwConfig_JNI.so
+   chcon -t $SEGivePermission $LibDir/libTwUI_JNI.so
+   chcon -t $SEGivePermission $LibDir/libTwUICP.so
+   [ -e $XDir/twxinput_drv.so ] && chcon -t $SEGivePermission $XDir/twxinput_drv.so
+fi
+
+# Set up the configuration
+[ -d /dev/shm ] && rm -f /dev/shm/*TwConfig*
+sed s#%BINDIR%#$BinDir#g $BinDir/TwFramework.cfg.ORIG >$BinDir/TwFramework.cfg
+$BinDir/TwCfgUtil /u $BinDir/TwFramework.cfg
+$BinDir/TwCfgUtil /u $BinDir/TwFactory.cfg
+
+# Produce the Remove script
+sed -e s#%BINDIR%#$BinDir#g \
+    -e s#%UDEVDIR%#$UdevDir#g \
+    -e s#%XDIR%#$XDir#g \
+    -e s#%LIBDIR%#$LibDir#g \
+    -e s#%LIBDIR32%#$LibDir32#g \
+    -e s#%LIBDIR64%#$LibDir64#g \
+    -e s#%SEDIR%#$SEDir#g \
+    -e s#%HOTPLUGDIR%#$HotplugDir#g \
+    -e s#%INITDIR%#$InitDir#g \
+    -e s#%XINITDIR%#$XinitDir#g \
+    -e s#%XINITSUFFIX%#$XinitSuffix#g \
+    $BinDir/Remove.ORIG >$BinDir/Remove
+
+# Produce the X input script
+sed -e s#%CONVERT%#$ConvertAtRead#g \
+    $BinDir/TWXinputInstall.perl.ORIG >$BinDir/TWXinputInstall.perl
+
+# Produce the CP start script
+sed -e s#%JAVABINDIR%#$JavaBinDir#g \
+    -e s#%BINDIR%#$BinDir# \
+    $BinDir/StartCP.ORIG >$BinDir/StartCP
+
+# Set any necessary permissions
+chmod a+x $BinDir/TwCalib
+chmod a+x $BinDir/TWXinputInstall.perl
+chmod u+x $BinDir/Remove
+chmod a+x $BinDir/StartCP

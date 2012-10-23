@@ -1,0 +1,107 @@
+
+<html style="overflow: hidden;"
+><head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+</head>
+<body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0px; height: 100%;">
+
+  	<style type="text/css">
+
+
+	g.selected rect { fill: yellow; }
+
+
+	body {
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+	
+	}
+	table td {height:25px; padding:3px 4px; text-align: center;
+	border-left: 0px solid: red; 
+	}
+
+	table td:first-child { border-left: none; }
+	table tr:nth-child(odd)  { background-color: #e0e0e0; }
+	table tr:nth-child(even) { background-color: #e8e8e8; }
+	table tr.selected:nth-child(odd)  { background-color: #a0a0c0; }
+	table tr.selected:nth-child(even) { background-color: #a8a8c8; }
+	table { width: 100%; border-collapse: collapse; padding: 0; margin: 0; }
+	table { width: 100%; border-collapse: collapse; padding: 0; margin: 0; }
+	table .hora {background:orange}
+	table { overflow-y: auto; font-family: sans; font-size:16px}
+        
+	table .quantidade 
+	{ 
+	overflow-x: auto; font-family: inherit ;
+	font-size:10px; width: 5px ; max-width:8px ; text-align : left }
+	table .precoLinha 
+	{ 
+	overflow-x: auto; font-family: sans; font-size:11px; 
+	width: 5px; min-width:11px; text-align : left
+	}
+	table .hora { overflow-y: auto; font-family: sans; font-size:12px; width: 7px}
+	table .produto { overflow-x: hidden; 
+	font-family: sans; font-size:12px; 
+	width: 96px ; max-width:105px}
+	table #tabelaPedido2 .nomeProduto   { font-family: sans; font-size:16px}
+         #tabelaPedido2 .precoLinha   { font-family: sans; font-size:16px}
+
+
+	</style>
+	<script type="text/javascript" src="/_utils/script/jquery.js">
+	</script>
+	<script type="text/javascript" src="/_utils/script/jquery.couch.js">
+	</script>
+	<script type="text/javascript" src="tabela.js">
+	</script>
+	<script type="text/javascript" src="main.js">
+	</script>
+	<script type="text/javascript" src="ecranMesa.js">
+	</script> 
+	<script type="text/javascript" src="jquery.numeric.js">
+	</script>
+	<script type="text/javascript" src="pedido.js">
+	</script>
+	<script type="text/javascript" src="stateMachineMesas.js">
+	</script>
+	<script type="text/javascript" src="stateMostraConta.js">
+	</script>
+	<script type="text/javascript" src="stateTransferencia.js">
+	</script>
+	<script type="text/javascript" src="stateAnulacao.js">
+	</script>
+	<script type="text/javascript" src="stateFactura.js">
+	</script>
+	<script type="text/javascript" src="jquery.svg.js">
+	</script>
+	<script type="text/javascript" src="jquery.svgdom.js">
+	</script>
+	<script type="text/javascript" src="jquery.svganim.js">
+	</script>
+
+	<div id="svgbasics" class="hasSVG">
+	  <svg version="1.1" width="800" height="600">
+	    <g id="svgBackground" stroke="black" stroke-width="2">
+	      <rect x="0" y="0" width="800" height="600" id="ecPed1" 
+		    fill="#649696" strokelinejoin="round" stroke="orange" stroke-width="2"></rect>
+	      
+	      
+	    </g>
+	  </svg>
+
+
+
+
+	</div>
+
+	 	  <div id="camada1" style="position:absolute;top: 0px;left:0; width: 800; height : 600">
+	    
+	    
+	    
+	    
+	  </div>
+	
+</body></html>

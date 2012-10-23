@@ -1,0 +1,153 @@
+<HTML>
+  
+  <style TYPE="text/css">
+
+    body {
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    padding:0px;line-height:0px;
+    border-top-color: #448844;
+    border-top-style: solid;
+    border-top-width: 0px;
+    height: 600px;
+    line-height: 0;
+    padding-bottom: 1px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding:1px;line-height:0px;
+    margin: 0px;
+    }
+
+
+ iframe {
+           
+
+frameborder:0; scrolling:no;
+            border: none; padding-top: 32px;
+            box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+        }
+
+
+  </style>
+  <script src="/_utils/script/jquery.js"></script>
+  <script src="/_utils/script/jquery.couch.js"></script>
+  <script type="text/javascript">
+
+
+    $(document).ready(function() {
+    var caminho='http://'+location.host+'/'+location.pathname.split('/')[1]+
+    '/'+location.pathname.split('/')[2]+'/'+location.pathname.split('/')[3];
+
+    console.log('http://'+location.host+location.pathname);
+
+    var fac2 = caminho+"/facturas2.html";
+    $("#iframe1").attr('src', fac2 );
+    $('#linkFact2').attr('href', fac2 );
+
+    var fac = caminho+"/facturas.html";
+    $('#linkFact').attr('href', fac );
+
+    var cont = caminho+"/contas.html";
+    $('#linkContas').attr('href', cont );
+
+    var prod = caminho+"/produtos.html";
+    $('#linkProd').attr('href', prod );
+
+    var exp = caminho+"/experiencias.html";
+    $('#linkExp').attr('href', exp );
+
+    
+    });
+  </script> 
+  
+  <HEAD>
+    <TITLE>Configuracao</TITLE>
+  </HEAD>
+  
+
+  <div align="LEFT">
+    <table bordercolorlight="#C0C0C0" bordercolordark="#808080" frame="BOX"
+	   rules="ALL" border="2" cellpadding="2" cellspacing="1" hspace="0" 
+	   vspace="0" width="745">
+      <tbody>
+	  
+	<td bgcolor="#BBBBBB" height="28" valign="CENTER" width="733">
+	  
+	  <div style="text-align: center;" >
+	    <style type="text/css">
+	      #rollbutton2 a  {
+	      color: #C0DCC0;
+	      font-size:15px;
+	      font-weight: bold;
+	      text-decoration: none;
+	      border:2px outset #D3D3D3;
+	      background-color:#680098;
+	      display: block;
+	      width:55px;
+	      height: 19px;
+	      padding: 40px;
+
+	      }
+	      #rollbutton2 a:hover {
+	      background-color: #C0DCC0;
+	      color:#680098;
+	      padding-left: 35px;
+	      border:2px inset #D3D3D3;
+	      }
+	    </style>
+
+	    <div id="rollbutton2">
+
+
+	      <a id="linkFact2" href="#"
+		 target="FRAME1"  title="Google:the best search engine!"   >
+		<center>Abertura dia</center></a>
+
+	      <a  id="linkFact"  href="#"
+		 target="FRAME1"   title="Langenberg: the second best search engine"   >
+		<center>Facturas</center></a>
+
+	      <a  id="linkContas"  href="#" target="FRAME1" 
+		 title="Langenberg: the second best search engine" >
+		<center>Contas</center></a>
+
+	      <a  id="linkProd"   href="#" target="FRAME1" 
+		 title="Produtos" onfocus="this.blur()"><center>Produtos</center></a>
+
+	      <a     href="http://localhosthtml" target="FRAME1" 
+		 title="Produtos"  ><center>Empregados</center></a>
+
+	      <a   id="linkExp"  href="#" 
+		 title="Produtos"  ><center>Esc</center></a>
+
+	    </div>
+
+
+
+
+	  </div>
+
+	</td>
+
+	<td bgcolor="#FFFFFF"   valign="TOP" width="733">
+	  <div style="text-align: center;">
+	    <img src="1x1.gif" align="bottom" border="0" height="3" hspace="0" vspace="0"
+		 width="1"></div>
+	  <div style="text-align: center;"><font color="#0000FF" 
+face="Arial,Helvetica,sans-serif" size="3"><iframe id="iframe1" name="FRAME1"  frameborder="0" height="600"
+		      width="830"  style="padding:0;margin:0;" ></iframe>
+
+	      <!-- src="id77.htm" -->
+
+	  </div>
+
+	</td>
+
+
+      </tbody>
+    </table>
+</HTML>

@@ -1,0 +1,29 @@
+SOFTWARE LICENSE AGREEMENT
+3M Touch Systems, Inc.
+MicroTouch(TM) Software
+
+PLEASE READ THIS LICENSE CAREFULLY BEFORE CONTINUING. BY DOWNLOADING OR INSTALLING THE SOFTWARE, YOU ARE AGREEING TO BE BOUND BY THE TERMS OF THIS LICENSE.  IF YOU DO NOT AGREE TO THE TERMS OF THIS LICENSE, TYPE 'N' AT THE END OF THIS AGREEMENT TO DISCONTINUE THE DOWNLOAD/INSTALLATION.
+
+1.  License.  The MicroTouch(TM)  software you are downloading/installing from 3M Touch Systems ("Software") is licensed to you by 3M Touch Systems, and 3M Touch Systems retains title to the Software.  This Software has been designed specifically for use with 3M Touch Systems' touch sensors and controllers.  This License allows you to install and use the Software on any PC for use with a 3M Touch Systems product (a "Touch Screen Product") comprised of at least a 3M Touch Systems controller in combination with a 3M Touch Systems touch sensor.  You may also make one back-up copy of the Software.  In the event that the PC is not on a network or does not have a CD drive, then you may make a single copy of the Software onto floppy disc in order to load the Software onto the PC.
+
+2.  Restrictions.  The Software contains copyrighted material, trade secrets and other proprietary material.  To protect them, you may not decompile, reverse engineer, disassemble or otherwise reduce the Software to human-perceivable form, except in the limited circumstances permitted by law, and you agree to include in any back-up copy of the Software that you make such copyright or other proprietary rights notices as are included with the Software as provided to you. You may not modify or create derivative works based on the Software, in whole or in part.  You may not transfer your rights in the Software, except that you may transfer the Software (including any back-up copy) together with the Touch Screen Product with which it is used to a transferee that agrees to comply with the terms of this License.  In such event, you may not keep any copy of the Software.
+
+3.  Documentation.  3M Touch Systems also authorizes you to download individual copies of the appropriate documentation ("Documentation") provided by 3M Touch Systems for use with the Software.  You will own the downloaded copy(ies) of the Documentation, and may make copies solely for your internal use provided the copies include the copyright notice, but you may not create derivative works of the Documentation, in whole or in part.
+
+4.  Termination.  This License is effective until terminated. You may terminate this License at any time by destroying all copies of the Software then in your possession or control.  This License will terminate immediately without notice from 3M Touch Systems if you fail to comply with any of its provisions. Upon termination, you must destroy all copies of the Software then in your possession or control.
+
+5.  Export Law Assurance.  You represent, warrant and agree that the Software will not be shipped, transferred or exported into any other country or used in any manner prohibited by the United States Export Administration Act or any other export laws, restrictions, or regulations.
+
+6.  Warranty.  3M Touch Systems warrants that for a period of 90 days from the date of receipt, the Software will materially conform to 3M Touch Systems' then-current published specifications for the most current version of such Software when used as instructed.  3M Touch Systems does not warrant the Software is free from all bugs, errors or omissions.  The cost of setup and evaluation of the Software shall be borne by you.
+
+THE ABOVE WARRANTIES EXTEND ONLY TO THE INITIAL LICENSEE OF THE SOFTWARE AND ARE NON-TRANSFERABLE. 3M TOUCH SYSTEMS DISCLAIMS ALL OTHER WARRANTIES RELATING TO THE SOFTWARE OR DOCUMENTATION, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT AND TITLE AND THOSE ARISING FROM TRADE USAGE OR COURSE OF DEALING.
+
+If the Software is found to be defective within the warranty period, then your exclusive remedy and 3M Touch Systems' sole obligation is to replace or correct the Software, or refund the purchase price, at 3M Touch Systems' option.
+
+7.  Limitation of Liability.  Except for personal injury, 3M Touch Systems shall not be liable for direct, indirect, special, incidental or consequential damages based upon breach of warranty, breach of contract, negligence, strict liability or any other legal theory.
+
+8.  U.S. Government End Users.  The Software and Documentation are considered "Commercial Items," as defined in 48 C.F.R. 2.101, consisting of "Commercial Computer Software" and "Commercial Computer Software Documentation," as defined in 48 C.F.R. 12.212 or 48 C.F.R. 227.7202, as applicable.  The Software and Documentation are being licensed to U.S. Government end users (i) only as Commercial Items, and (ii) with only those rights granted to all other end users pursuant to this Agreement.
+
+9.  Controlling Law and Severability.  This License shall be governed by and construed in accordance with the laws of the United States and the State of Minnesota, as applied to agreements entered into and to be performed entirely within Minnesota between Minnesota residents.  If for any reason a court of competent jurisdiction finds any provision of this License, or portions thereof, to be unenforceable, that provision of the License shall be enforced to the maximum extent permissible so as to affect the intent of the parties, and the remainder of this License shall continue in full force and effect.
+
+10.  Complete Agreement.  This License constitutes the entire agreement between the parties with respect to the use of the Software and Documentation.  No amendment to or modification of this License will be binding unless in writing and signed by a duly authorized representative of 3M Touch Systems.

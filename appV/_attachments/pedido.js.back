@@ -1,0 +1,482 @@
+var f1=function( tabela,node,t1,t2 ){
+
+    // Cache DOM references for later use.
+    var dom = {};
+  
+
+    // This is the current state of the widget. Once the
+    // states are defined, this will be further set.
+    var currentState = null;
+    
+    // I fascilitate the transition from the current to
+    // the target state.
+    var gotoState = function( newState ){
+	
+	// Check to see if the current state is available
+	// and has a teardown method:
+	if (currentState && currentState.teardown)
+	{    
+	    // Teardown the old state.
+	    currentState.teardown();   
+	}	
+	// Check to see if the new state has a setup method.
+	if (newState.setup){
+	    // Setup the new state.
+	    newState.setup()	    
+	}	
+	// Store the new state.
+	currentState = newState;
+	
+    };
+    
+
+    var inTabela=tabela;
+    
+    var daTabela= function() {return inTabela;}
+    var daNode  = function() {return node;}
+    var dat1  = function() {return t1;}
+    var dat2  = function() {return t2;}
+    //var daNode  = function() {return node;}   
+    // Define the states for this widget. Each state is going
+    // to have a setup and teardown state.
+
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+
+
+    var inDefault = {
+	
+	// I am the description of the state (mostly for
+	// debugging and documentation).
+	description: "I am the state in which only the menu header appears.",
+	
+	
+	// I am a short-hand GOTO function. This method can
+	// be passed off to event handlers without scoping
+	// problems.
+	gotoState: function(){	    
+	    // Put widget into this state.  
+	    gotoState( inDefault );	    
+	},
+		
+	// I setup the current state.
+	setup: function(){	   
+	 //   console.log('primESTe');
+	    $(document).bind( 'keydown', primeiraTecla );
+//	    $(document).bind( 'keydown', tt );
+	    
+
+	},	
+	
+	// I teardown the current state.
+	teardown: function(){	    
+	    // Remove the event.
+	    $(document).unbind( 'keydown', primeiraTecla );	    
+//	    $(document).unbind( 'keydown', tt );
+
+
+
+	}
+	
+    };
+
+
+
+    // ---------------------------------------------- //
+    // ----------------TECLAS FUNC------------------- //
+    // ---------------------------------------------- //
+    
+
+    var primeiraTecla = function (e) {
+	console.log('e');
+
+	if( (e.which >=48 &&  e.which <=57 ) || (e.which >=96 &&  e.which <=105)) //0 a 9
+	{
+	   // console.log('e');
+//	   gotoState(primeiroEstado);
+	    $('#codPed').val((e));
+	}
+	if( e.which ==8 ||  e.which ==46 ){//Backsape e Del
+	}
+	if( e.which ==109 ){//Esc
+	    constroiQuadroMesas2();
+
+	   //  console.log(((dat1().danode().parent().remove())));
+	    // console.log(((dat2().danode().parent().remove())));
+	   //  console.log(daNode().clear());
+	    // console.log( dat2().danode().parent().parent().parent().parent() );
+	   //  var db3 = $.couch.db("/faisca");
+// console.log(db3.info() );
+// console.log($.couch.db("faisca").info() );
+
+
+
+	    // console.log(constroiQuadroMesas2());
+	    //currentState.teardown(); 
+	    
+
+
+	}
+	if (e.which == 13)    {//Enter
+	  //  gotoState(primeiroEstado);
+	}
+    }
+
+
+
+   // $(document).bind( 'keydown', tt );
+
+    gotoState( inDefault );
+
+
+
+
+
+    
+}
+
+
+
+function tt(e){
+
+console.log('$("#aa").click();')
+    console.log(e.which);
+// constroiQuadroMesas2();  
+}
+
+
+
+
+/*
+// Create a sandbox for our menu widget controller.
+
+var f1=function( tabela,node,t1,t2 ){
+    
+    
+ 
+    // ---------------------------------------------- //
+    // ---------------------------------------------- // 
+    
+    var primeiroEstado = {
+	
+	
+	description: "Iatat .",
+
+	gotoState: function(){
+	    //console.log('prim');	    
+	    gotoState( primeiroEstado );	    
+	},
+		
+	setup: function(){
+	    //...
+	    df();
+	    $(document).bind( 'keydown', segundaTecla );
+	},
+	
+	teardown: function(){
+	    $(document).unbind( 'keydown', segundaTecla );	    
+	}
+	
+    };
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+    
+    
+    var segundoEstado = {
+	description: "I ayet.",
+	
+	gotoState: function(){
+	    gotoState( segundoEstado ); 
+	},
+	setup: function(){
+	    $(document).bind( 'keydown', segundaTecla );
+	},
+	teardown: function(){
+	    $(document).unbind( 'keydown', segundaTecla ); 
+	}
+	
+    };
+     // ---------------------------------------------- //
+    // ---------------------------------------------- //
+    
+    
+    var segundoEnterEstado = {
+	description: "I am et.",
+	gotoState: function(){
+	    gotoState( segundoEnterEstado );
+	},
+	setup: function(){
+	    $(document).bind( 'keydown', segundoEnterTecla );
+	},
+	teardown: function(){
+	    $(document).unbind( 'keydown', segundoEnterTecla );
+	}
+    };
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+     var ultimoEstado = {
+	description: "I am tet.",
+	
+	gotoState: function(){
+	    gotoState( ultimoEstado );
+	},
+	setup: function(){
+	  //  console.log('ultimo');
+	   return;
+	},
+	teardown: function(){
+	    return;
+	}
+	
+    };
+  
+    // ---------------------------------------------- //
+    // ----------------TECLAS FUNC------------------- //
+    // ---------------------------------------------- //
+    
+
+    var primeiraTecla = function (e) {
+
+
+	if( (e.which >=48 &&  e.which <=57 ) || (e.which >=96 &&  e.which <=105)) //0 a 9
+	{
+	   // console.log('e');
+	   gotoState(primeiroEstado);
+	    $('#codPed').val(numPad(e));
+	}
+	if( e.which ==8 ||  e.which ==46 ){//Backsape e Del
+	}
+	if( e.which ==27 ){//Esc
+	    
+	   //  console.log(((dat1().danode().parent().remove())));
+	    // console.log(((dat2().danode().parent().remove())));
+	   //  console.log(daNode().clear());
+	    // console.log( dat2().danode().parent().parent().parent().parent() );
+	   //  var db3 = $.couch.db("/faisca");
+// console.log(db3.info() );
+// console.log($.couch.db("faisca").info() );
+
+
+
+	    // console.log(constroiQuadroMesas2());
+	    //currentState.teardown(); 
+	    
+
+
+	}
+	if (e.which == 13)    {//Enter
+	  //  gotoState(primeiroEstado);
+	}
+    }
+
+    
+    var segundaTecla = function (e) {
+	if( (e.which >=48 &&  e.which <=57 ) || (e.which >=96 &&  e.which <=105)) //0 a 9
+	{
+	   // console.log('mais++');
+	    if ( $('#codPed').val().length<4 )
+		$('#codPed').val( $('#codPed').val()+numPad(e));
+	    // gotoState(inDefault);
+	}
+	else{
+	    if( e.which ==8 ||  e.which ==46 ){//Backsape e Del
+		if ( $('#codPed').val().length>0 ){
+		    var t1=$('#codPed').val() ;
+		   
+		    $('#codPed').val(t1.slice(0,(t1.length - 1)))
+		}
+		else 				      
+		    $('#codPed').val("");
+	    }
+
+	    else {
+		if( e.which ==27 ){//Esc
+		    gotoState(inDefault);
+		    $('#svgPedido').remove();
+		}
+		else 
+		{ 
+		    if (e.which == 13) 
+		    {  //Enter	
+			var q1=( $('#qntPed').val().trim())
+			//console.log(q1)
+			var p1=produtoObj( $('#codPed').val().trim());
+			//daTab().insereProdutoQuantidade(p1,2);
+			if(p1!=""){
+			    $('#nomPed').val(p1.nomeProduto);
+			    //  console.log($('#codPed').val());
+			    //  console.log(p1);
+			    gotoState(segundoEnterEstado);
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+
+    var segundoEnterTecla = function (e,t1) {
+	if( (e.which >=48 &&  e.which <=57 ) || (e.which >=96 &&  e.which <=105)) //0 a 9
+	{
+	   // console.log('qnt++');
+	   
+	    // gotoState(inDefault);
+	}
+	else{
+	    if( e.which ==8 ||  e.which ==46 ){//Backsape e Del
+		
+		if ( $('#codPed').val().length>0 ){
+		    var t1=$('#codPed').val() ;
+		    
+		    $('#codPed').val(t1.slice(0,(t1.length - 1)))
+		}
+		else 				      
+		    $('#codPed').val()= "";
+		 gotoState(segundoEstado);
+	    }
+	    else {
+		if( e.which ==27 ){//Esc
+		    gotoState(inDefault);
+		    $('#svgPedido').remove();
+		}
+	else 		   
+		{ 
+		    if (e.which == 13) 
+		    {  //Enter
+			var p1=produtoObj( $('#codPed').val().trim());
+			var q1=( $('#qntPed').val().trim())
+			var rq=centesimal(q1);
+
+			daTabela().insereProdutoQuantidade(p1,rq);
+			$('#nomPed').val(p1.nomeProduto);
+			//console.log($('#codPed').val());
+			//console.log("pede  "+p1.nomeProduto);
+			gotoState(inDefault);
+			$('#svgPedido').remove();
+		    }
+		}
+	    }
+	}
+    }
+    // ---------------------------------------------- //
+    // -----------FIM TECLAS FUNC ------------------- //
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+
+
+       
+    // To start with, put the menu into the default state.
+    gotoState( inDefault );
+   // console.log('comeca ouvir');
+    
+} 
+
+
+
+
+    // ---------------------------------------------- //
+    // ---------------------------------------------- //
+    // ----------------desenha----------------------- //
+    // ---------------------------------------------- //
+
+    
+    var df = function (){
+	$("body").append(' <div id="svgPedido"'+
+			 ' style="position:absolute;top: 5px;left:24; width: 700; height:480";>'+
+			 '</div>');
+	$('#svgPedido').svg();
+	var svg =$('#svgPedido').svg('get');
+//	console.log(svg);
+	var q = svg.group({id: 'svgGrupoPedidos',stroke: 'black',strokeWidth: 0});
+	var g = svg.group(q,{transform : "translate(50, 55 ) ",
+			     id: 'svgAnulacao',
+			     stroke: 'black',strokeWidth: 2});
+	svg.rect(g, 3, 3, 600, 350, {
+	    id: 'recQP',rx: "10", ry:"10",strokeWidth: 6,	
+	    fill: "grey",'stroke-linejoin': 'round', stroke: 'orange'
+	})
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// botao anular  
+	var g4 = svg.group(g,{
+	    transform :   "translate(73, 260 )", 
+	    onmousedown : "cancelaInsere(evt)"
+	});
+	svg.rect(g4,0,0,60,60,  {
+	    rx:"36" ,ry:"10", id:"botaoCancelaInsere" ,
+	    fill:"lightgrey", strokeLinejoin:"round", 
+	    stroke:"#1F1A17", strokeWidth:"3"   
+	});
+	svg.line(g4,15,15,45,45,{style:" stroke: red;   stroke-width: 9px"});
+	svg.line(g4,45,15,15,45,{style:" stroke: red;   stroke-width: 9px"});
+// fim botao anular
+/////////////////////////////////////////////////////////////////////////////////////////
+//inputs
+	$('#svgPedido').append('<div id="svgPedido" ;>'+
+			       '<input  id="codPed" '+
+			       ' style="font-size: 2.1em;position:absolute;top: 100px;left:100; width: 80;" size="3">'+
+			       '<input  id="nomPed" '+
+			       ' style="font-size: 2.1em;position:absolute;top: 100px;left:220; width: 300;"size="9">'+
+			       '<input  id="qntPed" VALUE="0.37" '+
+			       ' style="font-size: 2.1em;position:absolute;top: 200px;left:445; width: 70;"size="3">'+
+			       
+			       ' </div>');
+
+
+    }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+//modo de usar
+//f1( jQuery, jQuery( "div" ) );  
+
+
+
+
+   //----------------------------------------------
+   //-------------FUNCOES AUXILIARES  -------------
+   //----------------------------------------------
+
+// reconhece os algarismos do numPad
+function numPad(e){
+    if(e.which==96) return "0";
+    if(e.which==97) return "1";
+    if(e.which==98) return "2";
+    if(e.which==99) return "3";
+    if(e.which==100) return "4";
+    if(e.which==101) return "5";
+    if(e.which==102) return "6";
+    if(e.which==103) return "7";
+    if(e.which==104) return "8";
+    if(e.which==105) return "9";
+    return String.fromCharCode(e.which);	
+}
+
+
+
+//multiplica por cem ( 12.3 => 1230)
+//e retorna o inteiro
+function centesimal(e){
+    var a=e.split(".")
+    var fa1,fa2;
+    if(a.length==2){ fa1=parseInt((a[0])*100);
+		     fa2=parseInt(a[1])
+		   }
+    if(a.length==1)
+    { fa1=parseInt((a[0])*100);
+      fa2=0;
+    }
+
+    return ((fa1+fa2));
+
+}
+
+*/

@@ -1,0 +1,5 @@
+
+
+node xml.js  12/4/2011 7/7/2012
+xmllint --noout --schema SAFTPT_1_01.xsd  ii.xml
+ 

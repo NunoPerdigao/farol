@@ -1,0 +1,1 @@
+BUS=="usb",SYSFS{idVendor}=="0596",ACTION=="add",PROGRAM="/usr/bin/perl %BINDIR%/udev.perl %b %s{devnum}",RUN+="%BINDIR%/TwDriver add %c USB"

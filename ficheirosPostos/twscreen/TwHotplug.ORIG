@@ -1,0 +1,6 @@
+#!/bin/bash
+if test "${ACTION}" = "add"
+then
+   %BINDIR%/TwDriver add ${DEVICE} usb
+fi
+

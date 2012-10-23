@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Copyright 2009 3M. All rights reserved.
+#
+# This script starts the MT7 touch screen Control Panel
+#
+%JAVABINDIR%java -jar %BINDIR%/TwUIEngine.jar libTwUICP.so CPMain

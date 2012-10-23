@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Copyright 2009 3M. All rights reserved.
+#
+# 50MT7-xinit
+#
+# Author: 3M Touch Systems, Inc., Methuen, MA 01488 USA
+#
+# This script launches X Windows background tasks used by MT 7 for Linux.
+#
+%BINDIR%/TwMonitor &

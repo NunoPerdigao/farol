@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<title>Experiencias</title>
+	<style type="text/css">
+	@import "jquery.svg.css";
+
+
+	#svgbasics 
+	{
+	width: 800px;
+	height: 600px;
+	border: 0px solid #484;
+	padding:0px;line-height:0px;
+	}
+	body {
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+	padding:0px;line-height:0px;
+	border-top-color: #448844;
+	border-top-style: solid;
+	border-top-width: 0px;
+	height: 600px;
+	line-height: 0;
+	padding-bottom: 1px;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+	padding:0px;line-height:0px;
+	margin: 0px;
+	}
+	g.selected rect { fill: yellow; }
+	g { 
+	tranform: scale(1.2);}
+	table { width: 100%; border-collapse: collapse; padding: 0; margin: 0; }
+	
+	table { overflow-y: auto; font-family: sans; font-size:11px}
+	table .quantidade 
+	{ 
+	overflow-x: auto; font-family: inherit ;
+	font-size:10px; width: 5px ; max-width:8px ; text-align : left }
+	table .precoLinha 
+	{ 
+	overflow-x: auto; font-family: sans; font-size:11px; 
+	width: 5px; min-width:11px; text-align : left
+	}
+	table .hora { overflow-y: auto; font-family: sans; font-size:8px; width: 5px}
+	table .produto { overflow-x: hidden; 
+	font-family: sans; font-size:12px; 
+	width: 96px ; max-width:105px}
+	
+	table .qnt { overflow-x: auto; font-family: inherit ; 
+	font-size:10px; width: 5px ; max-width:8px ; text-align : left
+	}
+
+	table td {height:25px; padding:3px 4px; text-align: center;
+	border-left: 1px solid #d0d0d0; 
+	}
+	table td:first-child { border-left: none; }
+	table tr:nth-child(odd)  { background-color: #e0e0e0; }
+	table tr:nth-child(even) { background-color: #e8e8e8; }
+	table tr.selected:nth-child(odd)  { background-color: #a0a0c0; }
+	table tr.selected:nth-child(even) { background-color: #a8a8c8; }
+	
+	input#qntPed {
+    		font-family: tahoma, verdana, sans-serif;
+    		font-size: 2.1em;
+    		margin-left: 5px;
+    		padding-left: 2px;
+    		padding-right: 3px;
+	}
+
+
+	</style>
+	
+	
+	
+	<script type="text/javascript" src="/_utils/script/jquery.js">
+	</script>
+	<script type="text/javascript" src="/_utils/script/jquery.couch.js">
+	</script>
+	<script type="text/javascript" src="jquery.svg.js">
+	</script>
+	<script type="text/javascript" src="tabela.js">
+	</script>
+	<script type="text/javascript" src="jquery.svgdom.js">
+	</script>
+	<script type="text/javascript" src="jquery.svganim.js">
+	</script>
+	<script type="text/javascript" src="quadroMesas.js">
+	</script>
+	<script type="text/javascript" src="experiencias.js">
+	</script>
+	<script type="text/javascript" src="ecranMesa.js">
+	</script>
+	<script type="text/javascript" src="quadroPedido.js">
+	</script>	
+	<script type="text/javascript" src="jquery.numeric.js">
+	</script>
+	<script type="text/javascript" src="quadroFactura.js">
+	</script>
+	<script type="text/javascript" src="divideFactura.js">
+	</script>
+	<script type="text/javascript" src="transferenciaTabelas.js">
+	</script>
+	<script type="text/javascript" src="experiencias.js">	
+	</script>
+</head>
+
+
+
+
+
+
+<body>
+  
+
+  <div id="svgbasics">
+  </div>
+  <table id="tabelaLinhas" >
+    
+  </table>
+  <ul id="itemData">
+
+  </ul>
+</body>
+</html>

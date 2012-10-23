@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<title>Produtos Alves</title>
+  	<script src="/_utils/script/jquery.js"></script>
+  	<script src="/_utils/script/jquery.couch.js"></script>
+	<script src="ui/jquery-ui-1.8.17.custom.min.js"></script>
+	
+	<link rel="stylesheet" href="ui/jquery-ui-1.8.17.custom.css">
+  	<script src="produtos.js"></script>
+
+	<style>
+		body { font-size: 62.5%; }
+		label, input { display:block; }
+		input.text { margin-bottom:12px; width:95%; padding: .4em; }
+		fieldset { padding:0; border:0; margin-top:25px; }
+		h1 { font-size: 1.2em; margin: .6em 0; }
+		div#users-contain { width: 350px; margin: 20px 0; }
+		div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+		div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+		.ui-dialog .ui-state-error { padding: .3em; }
+		.validateTips { border: 1px solid transparent; padding: 0.3em; }
+	</style>
+  </head>
+  <body>
+
+    <h3>Produtos </h3>
+   <select id="escolheCategoria" name="degree">
+	  <option></option>
+	</select>
+
+    <div class="demo" style="overflow:auto;width:100%;float:top;height:360px;max-width:600px;min-width:680px">
+
+      
+
+
+      <table id="listaProdutos"  border="1">
+
+	<tbody>
+	  
+	</tbody>
+      </table>
+    </div>
+    
+    <ul id="tabela" ></ul>
+    <br>
+    <label for="name">coDProduto: </label>
+    <input type="text" name="contaId" id="codProduto" size=4 />
+    <label for="name">Nome: </label>
+    <input type="text" name="contaId" id="nomeProduto" size=37 />
+    <label for="name">Preco: </label>
+    <input type="text" name="contaId" id="precoProduto" size=4 />
+    <br>
+    <label for="name">categoriaProduto: </label>
+    <select id="categoriaProduto" name="catP">
+	  <option></option>
+    </select>
+    <label for="name">impressoraPedido: </label>
+    <select id="impressoraProduto" name="impP">
+      <option></option>
+    </select>
+    
+    
+    
+    
+
+    <br>
+    <input type="text" name="idpr" id="idp" size=38 />
+    <input type="text" name="revi" id="revp" size=38 />
+    <br>
+
+    <input type="button" id="actualizaProduto" value="actualiza" />
+    <input type="button" id="insereProduto" value="insere" />  
+    
+    <ul id="itemData" ></ul>
+    
+    <div id="dialog-form" title="Criar Produto">
+      <p class="validateTips">Prencha todos os campos.</p>
+      <form>
+	<fieldset>
+	  <label for="codigoP">Name</label>
+	  <input type="text" name="codigoP" id="codigoP" class="text ui-widget-content ui-corner-all" />
+	  <br>	  
+	  <label for="nomeP">Email</label>
+	  <input type="text" name="nomeP" id="nomeP" value="" class="text ui-widget-content ui-corner-all" />
+	  <br>
+	  <label for="precoP">Password</label>
+	  <input type="text" name="precoP" id="precoP" value="" class="text ui-widget-content ui-corner-all" />
+	</fieldset>
+      </form>
+    </div>     
+    
+   
+  </body>
+</html>

@@ -1,0 +1,4 @@
+function(doc, req) {
+	 if(doc.type != 'produto' && doc.type != 'sessao' && doc.type != 'empregado' && doc.type != 'impressora' && doc.type != 'conta' && doc.type != 'factura' && doc.type != 'mesa' && doc.type != 'produto' && doc.type != 'contadorCozinha' ) { return true; }  
+		   else { return false; }
+}
